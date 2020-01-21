@@ -1,8 +1,9 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-
-const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
 
 module.exports = {
     mode: 'development',
@@ -11,9 +12,9 @@ module.exports = {
         style: './src/scss/style.scss',
     },
     output: {
-        path: path.resolve(__dirname, 'src/css'),
-        filename: '[name].js',
-        chunkFilename: '[name].[id].js'
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'js/[name].js',
+        chunkFilename: 'js/[name].[id].js'
     },
     module: {
         rules: [
@@ -28,20 +29,25 @@ module.exports = {
         ]
     },
     plugins: [
-        new MiniCssExtractPlugin({filename: '[name].css'}),
-        new FixStyleOnlyEntriesPlugin()
+        new CleanWebpackPlugin(),
+        new MiniCssExtractPlugin({filename: 'css/[name].css'}),
+        new FixStyleOnlyEntriesPlugin(),
+        new CopyWebpackPlugin([
+            {
+                from: 'public',
+                to: './'
+            },
+        ]),
     ],
     optimization: {
         minimizer: [new OptimizeCSSAssetsPlugin({})]
     },
     devServer: {
-        contentBase: path.join(__dirname, 'src'),
+        contentBase: path.join(__dirname, 'dist'),
         watchContentBase: true,
         openPage: "index.html",
-        publicPath: '/',
         compress: true,
-        port: 3000,
         open: true,
-        inline: true
+        port: 3000,
     }
 };
